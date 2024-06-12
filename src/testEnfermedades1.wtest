@@ -1,0 +1,85 @@
+import personas.*
+import enfermedades.*
+
+describe "test enfermedades" {
+
+	const malaria = new Infecciosa(cantCelulasAmenazadas = 500)
+	const malariaPulenta = new Infecciosa(cantCelulasAmenazadas = 800)
+	const otitis = new Infecciosa(cantCelulasAmenazadas = 100)
+	const lupus = new Autoinmune(cantCelulasAmenazadas = 10000)
+
+	test "Una malaria de 500 células amenazadas" {
+		assert.equals(500, malaria.cantCelulasAmenazadas())
+	}
+
+	test "malaria más pulenta de 800 células amenazadas." {
+		assert.equals(800, malariaPulenta.cantCelulasAmenazadas())
+	}
+
+	test "una otitis de 100 células amenazadas" {
+		assert.equals(100, otitis.cantCelulasAmenazadas())
+	}
+
+	test "un lupus de 10000" {
+		assert.equals(10000, lupus.cantCelulasAmenazadas())
+	}
+
+}
+
+describe "test personas" {
+
+	const logan = new Persona(temperatura = 36, celulas = 3000000)
+	const frank = new Persona(temperatura = 36, celulas = 3500000)
+
+	test "Logan, con temperatura normal (36 grados) y con 3.000.000 de células" {
+		assert.equals(3000000, logan.celulas())
+		assert.equals(36, logan.temperatura())
+	}
+
+	test "Frank, con temperatura normal y 3.500.000 células" {
+		assert.equals(3500000, frank.celulas())
+		assert.equals(36, frank.temperatura())
+	}
+
+}
+describe "test de contagios"{
+	const logan = new Persona(temperatura = 36, celulas = 3000000)
+	const frank = new Persona(temperatura = 36, celulas = 3500000)
+	const malaria = new Infecciosa(cantCelulasAmenazadas = 500)
+	const malariaPulenta = new Infecciosa(cantCelulasAmenazadas = 800)
+	const otitis = new Infecciosa(cantCelulasAmenazadas = 100)
+	const lupus = new Autoinmune(cantCelulasAmenazadas = 10000)
+	method initialize(){
+		logan.contraerEnfermedades([malaria,otitis,lupus])
+		frank.contraerEnfermedades([malariaPulenta])
+	}
+	test"logan se contagia de malaria otitis y lupus"{
+		
+		assert.that(logan.enfermedades().contains(malaria))
+		assert.that(logan.enfermedades().contains(lupus))
+		assert.that(logan.enfermedades().contains(otitis))
+	}
+	test"frank se contagia de malariaPulenta"{
+		
+		assert.that(frank.enfermedades().contains(malariaPulenta))
+	}
+	test"cant de celulas afectadas que tiene Logan 10600"{
+		assert.equals(10600,logan.celulasAfectadas())
+	}
+	test"se reporduce la malaria que contrajo logan"{
+		malaria.reproducirse()
+		assert.equals(1000,logan.cantDeCelulasAfec(malaria))
+	}
+	test"hacer que Logan viva un dia de su vida"{
+		logan.pasarDia()
+		assert.equals(1,logan.diasEnfermo())
+	}
+	test"cant de celulas de logan que estan amenazadas por enfermedades agresivas"{
+		assert.equals(0, logan.cantDeCelulasAfectadasPorAgresivas())
+		assert.equals(0, frank.cantDeCelulasAfectadasPorAgresivas())
+	}
+	test"logan no deberia estar en coma"{
+		assert.equals("fiebre!",logan.tomarTemperatura())
+	}
+}
+
