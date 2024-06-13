@@ -1,0 +1,39 @@
+import personas.*
+import enfermedades.*
+
+describe "test de contagios"{
+	const logan = new Persona(temperatura = 36, celulas = 3000000)
+	const frank = new Persona(temperatura = 36, celulas = 3500000)
+	const cameron = new Medico(cantDosis = 125, temperatura = 36, celulas = 3000000)
+	const house = new JefeDepartamento(cantDosis = 0, temperatura = 36, celulas = 3000000)
+	const malaria = new Infecciosa(cantCelulasAmenazadas = 500)
+	const malariaPulenta = new Infecciosa(cantCelulasAmenazadas = 800)
+	const otitis = new Infecciosa(cantCelulasAmenazadas = 100)
+	const lupus = new Autoinmune(cantCelulasAmenazadas = 10000)
+	const muerte = new Muerte(cantCelulasAmenazadas = 0)
+	method initialize(){
+		logan.contraerEnfermedades([malaria,otitis,lupus])
+		frank.contraerEnfermedades([malariaPulenta])
+		cameron.contraerEnfermedades([malaria])
+		house.contraerEnfermedades([malaria,muerte])
+		house.setSubordinados([cameron])
+	}
+	test"Hacer que Cameron atienda a Logan"{
+		cameron.atenderPersona(logan,1)
+		assert.equals(400,logan.cantDeCelulasAfec(malaria))
+		assert.equals(9500,logan.cantDeCelulasAfec(lupus))
+	}
+	test"Hacer que House atienda a Cameron."{
+		house.atenderPersona(cameron,2)
+		assert.equals(300,cameron.cantDeCelulasAfec(malaria))
+	}
+	test"Hacer que Cameron contraiga malaria. Hacer que House contraiga malaria."{
+		assert.that(cameron.enfermedades().contains(malaria))
+		assert.that(house.enfermedades().contains(malaria))
+	}
+	test"Hacer que House contraiga la Muerte."{
+		house.enfermedades().find({enf => enf.cantCelulasAmenazadas() < 1}).decrementarTemperatura(house)
+		assert.equals(0,house.temperatura())
+	}
+
+}
